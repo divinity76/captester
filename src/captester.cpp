@@ -151,6 +151,32 @@ void verify_all_gbs(const int handle, std::string &buf1, std::string &buf2)
         }
     }
 }
+void synchandle(const int handle)
+{
+#ifdef _GNU_SOURCE
+    {
+        const int syncerr = syncfs(handle);
+        if (syncerr < 0)
+        {
+            std::cerr << "syncfs() failed: " << std::to_string(errno) << ": " << std::string(strerror(errno)) << std::endl;
+            return;
+        }
+    }
+#elif _BSD_SOURCE || _XOPEN_SOURCE >= 500 || _XOPEN_SOURCE && _XOPEN_SOURCE_EXTENDED
+    ((void)handle);
+    sync();
+#else
+    {
+        ((void)handle);
+        static bool warned = false;
+        if (!warned)
+        {
+            std::cout << "(warning: no syncfs()/sync() implementation found for this platform at compile time)" << std::endl;
+            warned = true;
+        }
+    }
+#endif
+}
 
 int main(int argc, char *argv[])
 {
@@ -162,7 +188,7 @@ int main(int argc, char *argv[])
             for (const auto &entry : std::filesystem::directory_iterator("/dev/"))
             {
                 std::string name = entry.path().filename().string();
-                if(name.find("sd") == 0 || name.find("hd") == 0 || name.find("vd") == 0 || name.find("xvd") == 0 || name.find("nvme") == 0)
+                if (name.find("sd") == 0 || name.find("hd") == 0 || name.find("vd") == 0 || name.find("xvd") == 0 || name.find("nvme") == 0)
                 {
                     std::cout << "Found device: " << entry.path() << std::endl;
                 }
@@ -189,19 +215,14 @@ int main(int argc, char *argv[])
         double time;
         std::cout << "testing GB #" << gb_no << std::endl;
         time = microtime();
-        //std::cout << "initializing GB string.." << std::flush;
+        // std::cout << "initializing GB string.." << std::flush;
         initialize_gb_string(gb_str, gb_no);
-        //std::cout << ". done in " << microtime() - time << " seconds" << std::endl;
+        // std::cout << ". done in " << microtime() - time << " seconds" << std::endl;
         std::cout << "writing GB string.." << std::flush;
         time = microtime();
         write_all(handle, gb_str);
         std::cout << ". syncing io cache with disk.." << std::flush;
-        const int syncerr = syncfs(handle);
-        if (syncerr < 0)
-        {
-            std::cerr << "syncfs() failed: " << std::to_string(errno) << ": " << std::string(strerror(errno)) << std::endl;
-            return 1;
-        }
+        synchandle(handle);
         std::cout << ". done in " << microtime() - time << " seconds" << std::endl;
         std::cout << "verifying all GBs.." << std::flush;
         time = microtime();
