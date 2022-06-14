@@ -10,4 +10,4 @@ this seems to work: g++ -std=c++17 -Ofast -Wall -Wextra -Wpedantic -Werror -o ca
 
 # pre-compiled binaries
 
-todo
+Windows and Linux binaries are available at https://github.com/divinity76/captester/releases/download/v1.0.0-beta1/captester.zip
