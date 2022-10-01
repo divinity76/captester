@@ -1,5 +1,5 @@
 # captester
-usb capacity tester (to detect fake-capacity USB drives)
+usb capacity tester (to detect fake-capacity USB drives' real capacity)
 Warning: this is a ***DESTRUCTIVE*** scan, it will delete everything on your usb device while scanning.
 Warning: this program use north of 2GB RAM while scanning. (would be possible to use less, but it would also be slower)
 # Usage: 
