@@ -201,7 +201,16 @@ int main(int argc, char *argv[])
         return 1;
     }
     std::cout << "strace -p " << getpid() << std::endl;
-    const int handle = open(argv[1], O_RDWR);
+    const int handle = open(argv[1],
+                            O_RDWR
+#ifdef O_DIRECT
+                                // missing on macos/bsd i think
+                                | O_DIRECT
+#endif
+    );
+#ifndef O_DIRECT
+    std::cout << "warning: O_DIRECT not supported on this platform, if real capacity is less than your RAM, results might be unreliable :( " << std::endl;
+#endif
     if (handle < 0)
     {
         std::cerr << "open() failed: " << std::to_string(errno) << ": " << std::string(strerror(errno)) << std::endl;
