@@ -5,7 +5,7 @@ usb capacity tester (to detect fake-capacity USB drives' real capacity)
 - this is a ***DESTRUCTIVE*** scan, it will re-format/delete everything on your usb device while scanning.
 - this program use north of 2GB RAM while scanning. (would be possible to use less, but it would also be slower)
 # Usage: 
-Start as root/administrator from cmd/terminal.
+Start a root/administrator cmd/terminal.
 - ./captester
 will list all the usb devices it can find (for example `/dev/sdX`)
 - ./captester /dev/sdX
